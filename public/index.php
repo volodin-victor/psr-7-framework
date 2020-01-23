@@ -1,16 +1,24 @@
 <?php
 
-function getLang(array $get, array $cookie, array $session, array $server, $default) {
+function getLang(array $request, $default) {
     return
-        !empty($get['lang']) ? $get['lang'] :
-            (!empty($cookie['lang']) ? $cookie['lang'] :
-                (!empty($session['lang']) ? $session['lang'] :
-                    (!empty($server['HTTP_ACCEPT_LANGUAGE']) ?substr($server['HTTP_ACCEPT_LANGUAGE'], 0, 2) :
+        !empty($request['get']['lang']) ? $request['get']['lang'] :
+            (!empty($request['cookie']['lang']) ? $request['cookie']['lang'] :
+                (!empty($request['session']['lang']) ? $request['session']['lang'] :
+                    (!empty($request['server']['HTTP_ACCEPT_LANGUAGE']) ?substr($request['server']['HTTP_ACCEPT_LANGUAGE'], 0, 2) :
                         $default)));
 }
 session_start();
+$request = [
+    'get' => $_GET,
+    'cookie' => $_COOKIE,
+    'session' => $_SESSION,
+    'server' => $_SERVER,
+];
+
+
 $name = $_GET['name'] ?? 'Guest';
-$lang = getLang($_GET, $_COOKIE, $_SESSION, $_SERVER,'en');
+$lang = getLang($request,'en');
 
 header('X-Developer: Victor Volodin');
 
