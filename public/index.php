@@ -1,20 +1,40 @@
 <?php
 
-function getLang(array $request, $default) {
+function getLang(Request $request, $default) {
     return
-        !empty($request['get']['lang']) ? $request['get']['lang'] :
-            (!empty($request['cookie']['lang']) ? $request['cookie']['lang'] :
-                (!empty($request['session']['lang']) ? $request['session']['lang'] :
-                    (!empty($request['server']['HTTP_ACCEPT_LANGUAGE']) ?substr($request['server']['HTTP_ACCEPT_LANGUAGE'], 0, 2) :
+        !empty($request->getQueryParams()['lang']) ? $request->getQueryParams()['lang'] :
+            (!empty($request->getCookies()['lang']) ? $request->getCookies()['lang'] :
+                (!empty($request->getSession()['lang']) ? $request->getSession()['lang'] :
+                    (!empty($request->getServerParam()['HTTP_ACCEPT_LANGUAGE']) ?substr($request->getServerParam()['HTTP_ACCEPT_LANGUAGE'], 0, 2) :
                         $default)));
 }
 session_start();
-$request = [
-    'get' => $_GET,
-    'cookie' => $_COOKIE,
-    'session' => $_SESSION,
-    'server' => $_SERVER,
-];
+
+class Request
+{
+    public function getQueryParams() : array
+    {
+        return $_GET;
+    }
+
+    public function getCookies() : array
+    {
+        return $_COOKIE;
+    }
+
+    public function getSession() :array
+    {
+        return $_SESSION;
+    }
+
+    public function getServerParam()
+    {
+        return $_SERVER;
+    }
+}
+
+
+$request = new Request();
 
 
 $name = $_GET['name'] ?? 'Guest';
